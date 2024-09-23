@@ -297,7 +297,7 @@ print(f"Average SSIM: {avg_ssim:.4f}")
 
 results_csv_path = os.path.join(Results_dir, 'results.csv')
 
-results.append({'Model': 'AR-CNN', 'Noise Type': 'N0', 'PSNR': avg_psnr, 'SSIM': avg_ssim})
+results.append({'Model': 'AR-CNN',  'Image Type': 'RGB', 'Noise Type': 'N0', 'PSNR': avg_psnr, 'SSIM': avg_ssim})
 
 if os.path.exists(results_csv_path):
     df_existing = pd.read_csv(results_csv_path)
