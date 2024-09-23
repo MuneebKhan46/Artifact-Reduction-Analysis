@@ -155,9 +155,9 @@ print(f"Total test Dataset: {len(test_data)}")
 
 
 
-train_loader = DataLoader(train_data, batch_size=16, shuffle=True)
-val_loader = DataLoader(val_data, batch_size=16, shuffle=False)
-test_loader = DataLoader(test_data, batch_size=16, shuffle=False)
+train_loader = DataLoader(train_data, shuffle=True)
+val_loader = DataLoader(val_data,  shuffle=False)
+test_loader = DataLoader(test_data, shuffle=False)
 
 
 model = ARCNN()
