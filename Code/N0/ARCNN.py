@@ -95,12 +95,15 @@ class ImageDataset(Dataset):
         self.non_n0_count = 0
         
         for _, row in df.iterrows():
+            image_name = row['image_name']
+
             if 'n0' in image_name:
                 self.n0_count += 1
             else:
                 self.non_n0_count += 1
             
-            if 'n0' not in row['image_name']:
+            # Proceed only if it's an n0 image (for your filtering needs)
+            if 'n0' not in image_name:
                 continue
 
             original_file_name = f"original_{row['image_name']}.png"
