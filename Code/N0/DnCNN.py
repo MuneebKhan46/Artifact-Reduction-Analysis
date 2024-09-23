@@ -160,96 +160,96 @@ print(f"Total Validation Dataset Original and Denoised: {len(val_orig), len(val_
 print(f"Total Test Dataset Original and Denoised: {len(test_orig), len(test_denoised)}")
 
 
-# model = DnCNN(depth=17, filters=64, image_channels=3, use_bnorm=True)
-# model.compile(optimizer=Adam(0.001), loss=sum_squared_error)
-# model_checkpoint = ModelCheckpoint(filepath='/ghosting-artifact-metric/WACV/Model/HighFreq_DnCNN_Model(N0).keras', save_best_only=True, monitor='val_loss', mode='min', verbose=1)
-# lr_scheduler = LearningRateScheduler(lr_schedule)
+model = DnCNN(depth=17, filters=64, image_channels=3, use_bnorm=True)
+model.compile(optimizer=Adam(0.001), loss=sum_squared_error)
+model_checkpoint = ModelCheckpoint(filepath='/ghosting-artifact-metric/WACV/Model/HighFreq_DnCNN_Model(N0).keras', save_best_only=True, monitor='val_loss', mode='min', verbose=1)
+lr_scheduler = LearningRateScheduler(lr_schedule)
 
-# history = model.fit( data_generator(train_orig, train_denoised, batch_size=batch_size), steps_per_epoch=len(train_orig) // batch_size, epochs=epochs, verbose=1, validation_data=data_generator(val_orig, val_denoised, batch_size=batch_size), 
-#                     validation_steps=len(val_orig) // batch_size, callbacks=[lr_scheduler, model_checkpoint])
-
-
-# with tf.keras.utils.custom_object_scope({'sum_squared_error': sum_squared_error}):
-#     model = tf.keras.models.load_model("/ghosting-artifact-metric/WACV/Model/HighFreq_DnCNN_Model(N0).keras")
-
-# def save_image(image_tensor, filename):
-#     image_array = (image_tensor * 255).clip(0, 255).astype(np.uint8)
-#     image_pil = Image.fromarray(image_array)
-#     image_pil.save(filename)
+history = model.fit( data_generator(train_orig, train_denoised, batch_size=batch_size), steps_per_epoch=len(train_orig) // batch_size, epochs=epochs, verbose=1, validation_data=data_generator(val_orig, val_denoised, batch_size=batch_size), 
+                    validation_steps=len(val_orig) // batch_size, callbacks=[lr_scheduler, model_checkpoint])
 
 
-# def visualize_and_save_patches(original, denoised, restored, idx):
+with tf.keras.utils.custom_object_scope({'sum_squared_error': sum_squared_error}):
+    model = tf.keras.models.load_model("/ghosting-artifact-metric/WACV/Model/HighFreq_DnCNN_Model(N0).keras")
+
+def save_image(image_tensor, filename):
+    image_array = (image_tensor * 255).clip(0, 255).astype(np.uint8)
+    image_pil = Image.fromarray(image_array)
+    image_pil.save(filename)
+
+
+def visualize_and_save_patches(original, denoised, restored, idx):
       
-#     original_file = os.path.join(image_save_dir, f"DnCNN_original_patch_{idx}.png")
-#     denoised_file = os.path.join(image_save_dir, f"DnCNN_denoised_patch_{idx}.png")
-#     restored_file = os.path.join(image_save_dir, f"DnCNN_restored_patch_{idx}.png")
+    original_file = os.path.join(image_save_dir, f"DnCNN_original_patch_{idx}.png")
+    denoised_file = os.path.join(image_save_dir, f"DnCNN_denoised_patch_{idx}.png")
+    restored_file = os.path.join(image_save_dir, f"DnCNN_restored_patch_{idx}.png")
     
-#     save_image(original, original_file)
-#     save_image(denoised, denoised_file)
-#     save_image(restored, restored_file)
+    save_image(original, original_file)
+    save_image(denoised, denoised_file)
+    save_image(restored, restored_file)
 
-#     # fig, axs = plt.subplots(1, 3, figsize=(15, 5))
-#     # axs[0].imshow(original.permute(1, 2, 0).cpu().numpy())
-#     # axs[0].set_title("Original Image")
-#     # axs[1].imshow(denoised.permute(1, 2, 0).cpu().numpy())
-#     # axs[1].set_title("Denoised Image")
-#     # axs[2].imshow(restored.permute(1, 2, 0).cpu().numpy())
-#     # axs[2].set_title("ARCNN")
-#     # for ax in axs:
-#     #     ax.axis('off')
-#     # plt.show()
+    # fig, axs = plt.subplots(1, 3, figsize=(15, 5))
+    # axs[0].imshow(original.permute(1, 2, 0).cpu().numpy())
+    # axs[0].set_title("Original Image")
+    # axs[1].imshow(denoised.permute(1, 2, 0).cpu().numpy())
+    # axs[1].set_title("Denoised Image")
+    # axs[2].imshow(restored.permute(1, 2, 0).cpu().numpy())
+    # axs[2].set_title("ARCNN")
+    # for ax in axs:
+    #     ax.axis('off')
+    # plt.show()
 
 
 
-# predictions = model.predict(test_denoised, batch_size=batch_size)
+predictions = model.predict(test_denoised, batch_size=batch_size)
 
-# psnr_values, ssim_values = [], []
-# results = []
+psnr_values, ssim_values = [], []
+results = []
 
-# image_save_dir = os.path.join(Results_dir, 'images/DnCNN(N0)/')
-# os.makedirs(image_save_dir, exist_ok=True)
+image_save_dir = os.path.join(Results_dir, 'images/DnCNN(N0)/')
+os.makedirs(image_save_dir, exist_ok=True)
 
-# visualized_images = 0
-# visualize_limit = 10
+visualized_images = 0
+visualize_limit = 10
 
-# for i in range(len(test_orig)):
+for i in range(len(test_orig)):
 
-#     psnr_value = psnr(test_orig[i], predictions[i])
+    psnr_value = psnr(test_orig[i], predictions[i])
     
-#     patch_size = min(test_orig[i].shape[0], test_orig[i].shape[1])
-#     win_size = min(7, patch_size)
+    patch_size = min(test_orig[i].shape[0], test_orig[i].shape[1])
+    win_size = min(7, patch_size)
     
-#     if win_size >= 3:
-#         ssim_value = ssim(test_orig[i], predictions[i], win_size=win_size, channel_axis=-1, data_range=1.0)
-#         ssim_values.append(ssim_value)
-#     else:
-#         print(f"Skipping SSIM for image {i} due to insufficient size (patch size: {patch_size})")
+    if win_size >= 3:
+        ssim_value = ssim(test_orig[i], predictions[i], win_size=win_size, channel_axis=-1, data_range=1.0)
+        ssim_values.append(ssim_value)
+    else:
+        print(f"Skipping SSIM for image {i} due to insufficient size (patch size: {patch_size})")
     
-#     psnr_values.append(psnr_value)
+    psnr_values.append(psnr_value)
     
-#     if visualized_images < visualize_limit:
-#         visualize_and_save_patches(test_orig[i], test_denoised[i], predictions[i], visualized_images)
-#         visualized_images += 1
+    if visualized_images < visualize_limit:
+        visualize_and_save_patches(test_orig[i], test_denoised[i], predictions[i], visualized_images)
+        visualized_images += 1
     
 
 
-# avg_psnr = np.mean(psnr_values)
-# avg_ssim = np.mean(ssim_values) if ssim_values else 0
+avg_psnr = np.mean(psnr_values)
+avg_ssim = np.mean(ssim_values) if ssim_values else 0
 
-# print(f"Average PSNR: {avg_psnr:.4f} dB")
-# print(f"Average SSIM: {avg_ssim:.4f}")
+print(f"Average PSNR: {avg_psnr:.4f} dB")
+print(f"Average SSIM: {avg_ssim:.4f}")
 
 
-# results_csv_path = os.path.join(Results_dir, 'results.csv')
+results_csv_path = os.path.join(Results_dir, 'results.csv')
 
-# results.append({'Model': 'DnCNN', 'Image Type': 'RGB', 'Noise Type': 'N0', 'PSNR': avg_psnr, 'SSIM': avg_ssim})
+results.append({'Model': 'DnCNN', 'Image Type': 'RGB', 'Noise Type': 'N0', 'PSNR': avg_psnr, 'SSIM': avg_ssim})
 
-# if os.path.exists(results_csv_path):
-#     df_existing = pd.read_csv(results_csv_path)
-#     df_new = pd.DataFrame(results)
-#     df_results = pd.concat([df_existing, df_new], ignore_index=True)
-# else:
-#     df_results = pd.DataFrame(results)
-# df_results.to_csv(results_csv_path, index=False)
+if os.path.exists(results_csv_path):
+    df_existing = pd.read_csv(results_csv_path)
+    df_new = pd.DataFrame(results)
+    df_results = pd.concat([df_existing, df_new], ignore_index=True)
+else:
+    df_results = pd.DataFrame(results)
+df_results.to_csv(results_csv_path, index=False)
 
-# print(f"Results saved to {results_csv_path}")
+print(f"Results saved to {results_csv_path}")
