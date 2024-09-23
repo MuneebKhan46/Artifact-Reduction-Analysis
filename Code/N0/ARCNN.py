@@ -91,8 +91,15 @@ class ImageDataset(Dataset):
     def __init__(self, csv_path, original_dir, denoised_dir, patch_size=224):
         df = pd.read_csv(csv_path)
         self.pairs = []
+        self.n0_count = 0
+        self.non_n0_count = 0
         
         for _, row in df.iterrows():
+            if 'n0' in image_name:
+                self.n0_count += 1
+            else:
+                self.non_n0_count += 1
+            
             if 'n0' not in row['image_name']:
                 continue
 
@@ -115,7 +122,8 @@ class ImageDataset(Dataset):
         denoised_patch = torch.from_numpy(denoised_patch).permute(2, 0, 1).float() / 255.0
         
         return original_patch, denoised_patch
-
+    def get_image_counts(self):
+        return self.n0_count, self.non_n0_count
 
 
 original_dir = '/ghosting-artifact-metric/dataset/m-gaid-dataset-high-frequency/original'
@@ -133,6 +141,12 @@ val_data, test_data = train_test_split(temp_data, test_size=0.5, random_state=42
 print(len(train_data))
 print(len(val_data))
 print(len(test_data))
+
+n0_count, non_n0_count = dataset.get_image_counts()
+
+print(f"Total images with 'n0': {n0_count}")
+print(f"Total images without 'n0': {non_n0_count}")
+
 
 # train_loader = DataLoader(train_data, batch_size=16, shuffle=True)
 # val_loader = DataLoader(val_data, batch_size=16, shuffle=False)
