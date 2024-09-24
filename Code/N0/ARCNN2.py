@@ -111,8 +111,8 @@ def load_data_from_csv(csv_path, original_dir, denoised_dir):
         original_path = os.path.join(original_dir, original_file_name)
         denoised_path = os.path.join(denoised_dir, denoised_file_name)
         
-        original_patches, original_patch_numbers = extract_y_channel_from_yuv_with_patch_numbers(original_path, row['width'], row['height'])
-        denoised_patches, denoised_patch_numbers = extract_y_channel_from_yuv_with_patch_numbers(denoised_path, row['width'], row['height'])
+        original_patches = extract_y_channel_from_yuv_with_patch_numbers(original_path, row['width'], row['height'])
+        denoised_patches = extract_y_channel_from_yuv_with_patch_numbers(denoised_path, row['width'], row['height'])
 
         all_original_patches.extend(original_patches)
         all_denoised_patches.extend(denoised_patches)
