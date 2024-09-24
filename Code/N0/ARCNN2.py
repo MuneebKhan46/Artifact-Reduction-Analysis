@@ -22,7 +22,7 @@ from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from skimage.metrics import peak_signal_noise_ratio as psnr, structural_similarity as ssim
 
-EPOCHS = 50
+EPOCHS = 5
 
 Results_dir = '/ghosting-artifact-metric/Artifact-Reduction-Analysis/Results'
 if not os.path.exists(Results_dir):
@@ -321,7 +321,7 @@ with torch.no_grad():
         for i in range(len(outputs_test)):
             
             psnr_scores.append(psnr(original_test[i], outputs_test[i]))
-            win_size = 7
+            win_size = 3
             if original_test[i].shape[0] >= win_size and original_test[i].shape[1] >= win_size:
                 ssim_val = ssim(original_test[i], outputs_test[i], win_size=win_size, channel_axis=-1, data_range=1.0)
                 ssim_scores.append(ssim_val)
