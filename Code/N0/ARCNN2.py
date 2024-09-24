@@ -319,16 +319,23 @@ with torch.no_grad():
         original_test = original_test.cpu().numpy()
 
         for i in range(len(outputs_test)):
-            psnr_scores.append(psnr(original_test[i], outputs_test[i]))
-
-            patch_size = min(outputs_test[i].shape[0], outputs_test[i].shape[1])
-            win_size = min(7, patch_size) 
             
-            if win_size >= 3:
+            psnr_scores.append(psnr(original_test[i], outputs_test[i]))
+            win_size = 7
+            if original_test[i].shape[0] >= win_size and original_test[i].shape[1] >= win_size:
                 ssim_val = ssim(original_test[i], outputs_test[i], win_size=win_size, channel_axis=-1, data_range=1.0)
                 ssim_scores.append(ssim_val)
             else:
                 print(f"Skipping SSIM for patch {i} due to insufficient size")
+                
+            # patch_size = min(outputs_test[i].shape[0], outputs_test[i].shape[1])
+            # win_size = min(7, patch_size) 
+            
+            # if win_size >= 3:
+            #     ssim_val = ssim(original_test[i], outputs_test[i], win_size=win_size, channel_axis=-1, data_range=1.0)
+            #     ssim_scores.append(ssim_val)
+            # else:
+            #     print(f"Skipping SSIM for patch {i} due to insufficient size")
 
             # if visualized_images < visualize_limit:
             #     visualize_and_save_patches(original_test[i], denoised_test[i], outputs_test[i], visualized_images)
