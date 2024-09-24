@@ -49,7 +49,7 @@ class ARCNN(nn.Module):
             nn.Conv2d(32, 16, kernel_size=1),
             nn.PReLU()
         )
-        self.last = nn.Conv2d(16, 3, kernel_size=5, padding=2)
+        self.last = nn.Conv2d(16, 1, kernel_size=5, padding=2)
 
         self._initialize_weights()
 
