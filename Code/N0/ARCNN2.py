@@ -261,27 +261,27 @@ for epoch in range(EPOCHS):
 model.load_state_dict(torch.load(os.path.join(model_dir, 'RAW_ARCNN_Model(N0).pth')))
 model.eval()
 
-def save_image(image_tensor, filename):
-    image_array = (image_tensor * 255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
-    image_pil = Image.fromarray(image_array)
-    image_pil.save(filename)
+# def save_image(image_tensor, filename):
+#     image_array = (image_tensor * 255).clamp(0, 255).byte().permute(1, 2, 0).cpu().numpy()
+#     image_pil = Image.fromarray(image_array)
+#     image_pil.save(filename)
 
 
-def visualize_and_save_patches(original, denoised, restored, idx):
-    if isinstance(original, np.ndarray):
-        original = torch.tensor(original)
-    if isinstance(denoised, np.ndarray):
-        denoised = torch.tensor(denoised)
-    if isinstance(restored, np.ndarray):
-        restored = torch.tensor(restored)
+# def visualize_and_save_patches(original, denoised, restored, idx):
+#     if isinstance(original, np.ndarray):
+#         original = torch.tensor(original)
+#     if isinstance(denoised, np.ndarray):
+#         denoised = torch.tensor(denoised)
+#     if isinstance(restored, np.ndarray):
+#         restored = torch.tensor(restored)
     
-    original_file = os.path.join(image_save_dir, f"RAW_ARCNN_original_patch_{idx}.png")
-    denoised_file = os.path.join(image_save_dir, f"RAW_ARCNN_denoised_patch_{idx}.png")
-    restored_file = os.path.join(image_save_dir, f"RAW_ARCNN_restored_patch_{idx}.png")
+#     original_file = os.path.join(image_save_dir, f"RAW_ARCNN_original_patch_{idx}.png")
+#     denoised_file = os.path.join(image_save_dir, f"RAW_ARCNN_denoised_patch_{idx}.png")
+#     restored_file = os.path.join(image_save_dir, f"RAW_ARCNN_restored_patch_{idx}.png")
     
-    save_image(original, original_file)
-    save_image(denoised, denoised_file)
-    save_image(restored, restored_file)
+#     save_image(original, original_file)
+#     save_image(denoised, denoised_file)
+#     save_image(restored, restored_file)
 
     # fig, axs = plt.subplots(1, 3, figsize=(15, 5))
     # axs[0].imshow(original.permute(1, 2, 0).cpu().numpy())
@@ -297,26 +297,28 @@ def visualize_and_save_patches(original, denoised, restored, idx):
 psnr_scores, ssim_scores = [], []
 results = []
 
-image_save_dir = os.path.join(Results_dir, 'RAW_Images/AR-CNN(N0)/')
-os.makedirs(image_save_dir, exist_ok=True)
+# image_save_dir = os.path.join(Results_dir, 'RAW_Images/AR-CNN(N0)/')
+# os.makedirs(image_save_dir, exist_ok=True)
 
-visualized_images = 0
-visualize_limit = 10
+# visualized_images = 0
+# visualize_limit = 10
 
 
 with torch.no_grad():
     for original_test, denoised_test in test_loader:
         original_test, denoised_test = original_test.to(device), denoised_test.to(device)
-        
+    
         outputs_test = model(denoised_test)
+        
+        if outputs_test.shape != original_test.shape:
+            outputs_test = F.interpolate(outputs_test, size=original_test.shape[2:], mode='bilinear', align_corners=False)
         
         outputs_test = outputs_test.cpu().numpy()
         original_test = original_test.cpu().numpy()
 
         for i in range(len(outputs_test)):
-            
             psnr_scores.append(psnr(original_test[i], outputs_test[i]))
-            
+
             patch_size = min(outputs_test[i].shape[0], outputs_test[i].shape[1])
             win_size = min(7, patch_size) 
             
@@ -326,10 +328,9 @@ with torch.no_grad():
             else:
                 print(f"Skipping SSIM for patch {i} due to insufficient size")
 
-            if visualized_images < visualize_limit:
-              visualize_and_save_patches(original_test[i], denoised_test[i], outputs_test[i], visualized_images)
-              visualized_images += 1
-
+            # if visualized_images < visualize_limit:
+            #     visualize_and_save_patches(original_test[i], denoised_test[i], outputs_test[i], visualized_images)
+            #     visualized_images += 1
    
 
 
