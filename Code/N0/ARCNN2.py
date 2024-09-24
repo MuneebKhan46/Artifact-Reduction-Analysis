@@ -308,9 +308,10 @@ results = []
 with torch.no_grad():
     for original_test, denoised_test in test_loader:
         original_test, denoised_test = original_test.to(device), denoised_test.to(device)
+        print(original_test.shape, denoised_test.shape)
     
         outputs_test = model(denoised_test)
-        
+        print(outputs_test.shape)
         if outputs_test.shape != original_test.shape:
             outputs_test = F.interpolate(outputs_test, size=original_test.shape[2:], mode='bilinear', align_corners=False)
         
