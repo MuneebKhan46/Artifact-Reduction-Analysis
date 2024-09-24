@@ -41,7 +41,7 @@ class ARCNN(nn.Module):
     def __init__(self):
         super(ARCNN, self).__init__()
         self.base = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=9, padding=4),
+            nn.Conv2d(1, 64, kernel_size=9, padding=4),  # Change 3 to 1 for single-channel input
             nn.PReLU(),
             nn.Conv2d(64, 32, kernel_size=7, padding=3),
             nn.PReLU(),
