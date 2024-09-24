@@ -15,6 +15,7 @@ import pandas as pd
 from PIL import Image
 import torch.nn as nn
 import tensorflow as tf
+import torch.nn.functional as F
 import matplotlib.pyplot as plt
 from torch.utils.data import Subset
 from torch.utils.data import Dataset, DataLoader
