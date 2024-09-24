@@ -305,28 +305,28 @@ results = []
 # visualize_limit = 10
 
 
-with torch.no_grad():
-    for original_test, denoised_test in test_loader:
-        original_test, denoised_test = original_test.to(device), denoised_test.to(device)
-        print(original_test.shape, denoised_test.shape)
+# with torch.no_grad():
+#     for original_test, denoised_test in test_loader:
+#         original_test, denoised_test = original_test.to(device), denoised_test.to(device)
+#         print(original_test.shape, denoised_test.shape)
     
-        outputs_test = model(denoised_test)
-        print(outputs_test.shape)
-        if outputs_test.shape != original_test.shape:
-            outputs_test = F.interpolate(outputs_test, size=original_test.shape[2:], mode='bilinear', align_corners=False)
+#         outputs_test = model(denoised_test)
+#         print(outputs_test.shape)
+#         if outputs_test.shape != original_test.shape:
+#             outputs_test = F.interpolate(outputs_test, size=original_test.shape[2:], mode='bilinear', align_corners=False)
         
-        outputs_test = outputs_test.cpu().numpy()
-        original_test = original_test.cpu().numpy()
+#         outputs_test = outputs_test.cpu().numpy()
+#         original_test = original_test.cpu().numpy()
 
-        for i in range(len(outputs_test)):
+#         for i in range(len(outputs_test)):
             
-            psnr_scores.append(psnr(original_test[i], outputs_test[i]))
-            win_size = 3
-            if original_test[i].shape[0] >= win_size and original_test[i].shape[1] >= win_size:
-                ssim_val = ssim(original_test[i], outputs_test[i], win_size=win_size, channel_axis=-1, data_range=1.0)
-                ssim_scores.append(ssim_val)
-            else:
-                print(f"Skipping SSIM for patch {i} due to insufficient size")
+#             psnr_scores.append(psnr(original_test[i], outputs_test[i]))
+#             win_size = 3
+#             if original_test[i].shape[0] >= win_size and original_test[i].shape[1] >= win_size:
+#                 ssim_val = ssim(original_test[i], outputs_test[i], win_size=win_size, channel_axis=-1, data_range=1.0)
+#                 ssim_scores.append(ssim_val)
+#             else:
+#                 print(f"Skipping SSIM for patch {i} due to insufficient size")
                 
             # patch_size = min(outputs_test[i].shape[0], outputs_test[i].shape[1])
             # win_size = min(7, patch_size) 
@@ -342,6 +342,30 @@ with torch.no_grad():
             #     visualized_images += 1
    
 
+with torch.no_grad():
+    for original_test, denoised_test in test_loader:
+        original_test, denoised_test = original_test.to(device), denoised_test.to(device)
+        print(original_test.shape, denoised_test.shape)
+    
+        outputs_test = model(denoised_test)
+        print(outputs_test.shape)
+        
+        # Ensure the output size matches the original input size
+        if outputs_test.shape != original_test.shape:
+            outputs_test = F.interpolate(outputs_test, size=original_test.shape[2:], mode='bilinear', align_corners=False)
+        
+        outputs_test = outputs_test.cpu().numpy()
+        original_test = original_test.cpu().numpy()
+
+        for i in range(len(outputs_test)):
+            psnr_scores.append(psnr(original_test[i][0], outputs_test[i][0]))  # SSIM needs 2D input, so [0] removes channel axis
+            
+            win_size = 3
+            if original_test[i][0].shape[0] >= win_size and original_test[i][0].shape[1] >= win_size:
+                ssim_val = ssim(original_test[i][0], outputs_test[i][0], win_size=win_size, data_range=1.0)
+                ssim_scores.append(ssim_val)
+            else:
+                print(f"Skipping SSIM for patch {i} due to insufficient size")
 
 avg_psnr = np.mean(psnr_scores)
 avg_ssim = np.mean(ssim_scores) if ssim_scores else 0
