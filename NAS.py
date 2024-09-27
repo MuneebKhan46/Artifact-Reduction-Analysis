@@ -183,7 +183,11 @@ tuner = Hyperband(
 
 
 best_model = tuner.get_best_models(num_models=1)[0]
+best_model.build(input_shape=(None, 224, 224, 1))
+
+# Now print the summary of the best model
 best_model.summary()
+
 best_model.save('/ghosting-artifact-metric/Artifact-Reduction-Analysis/nas_directory/best_ghosting_artifact_detector.h5')
 
 
