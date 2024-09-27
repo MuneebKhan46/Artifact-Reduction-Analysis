@@ -121,65 +121,65 @@ X_train, X_test, y_train, y_test = train_test_split(X_balanced, y_balanced, test
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 
-class CNNHyperModel(keras_tuner.HyperModel):
-    def build(self, hp):
-        with strategy.scope():
-            model = keras.Sequential()
+# class CNNHyperModel(keras_tuner.HyperModel):
+#     def build(self, hp):
+#         with strategy.scope():
+#             model = keras.Sequential()
             
-            # Convolutional layers
-            conv_blocks = hp.Int('conv_blocks', 3, 7, default=5)
-            for i in range(conv_blocks):
-                filters = hp.Int(f'filters_{i}', 64, 256, step=64, default=128)
-                kernel_size = hp.Choice(f'kernel_size_{i}', [3, 5], default=3)
-                if i == 0:
-                    model.add(layers.Conv2D(
-                        filters=filters,
-                        kernel_size=kernel_size,
-                        activation='relu',
-                        padding='same',
-                        input_shape=(224, 224, 1)
-                    ))
-                else:
-                    model.add(layers.Conv2D(
-                        filters=filters,
-                        kernel_size=kernel_size,
-                        activation='relu',
-                        padding='same'
-                    ))
-                if hp.Boolean(f'batch_norm_{i}', default=True):
-                    model.add(layers.BatchNormalization())
-                model.add(layers.MaxPooling2D())
-                if hp.Boolean(f'conv_dropout_{i}', default=False):
-                    dropout_rate = hp.Float(f'conv_dropout_rate_{i}', min_value=0.1, max_value=0.5, step=0.1, default=0.2)
-                    model.add(layers.Dropout(rate=dropout_rate))
+#             # Convolutional layers
+#             conv_blocks = hp.Int('conv_blocks', 3, 7, default=5)
+#             for i in range(conv_blocks):
+#                 filters = hp.Int(f'filters_{i}', 64, 256, step=64, default=128)
+#                 kernel_size = hp.Choice(f'kernel_size_{i}', [3, 5], default=3)
+#                 if i == 0:
+#                     model.add(layers.Conv2D(
+#                         filters=filters,
+#                         kernel_size=kernel_size,
+#                         activation='relu',
+#                         padding='same',
+#                         input_shape=(224, 224, 1)
+#                     ))
+#                 else:
+#                     model.add(layers.Conv2D(
+#                         filters=filters,
+#                         kernel_size=kernel_size,
+#                         activation='relu',
+#                         padding='same'
+#                     ))
+#                 if hp.Boolean(f'batch_norm_{i}', default=True):
+#                     model.add(layers.BatchNormalization())
+#                 model.add(layers.MaxPooling2D())
+#                 if hp.Boolean(f'conv_dropout_{i}', default=False):
+#                     dropout_rate = hp.Float(f'conv_dropout_rate_{i}', min_value=0.1, max_value=0.5, step=0.1, default=0.2)
+#                     model.add(layers.Dropout(rate=dropout_rate))
             
-            model.add(layers.Flatten())
+#             model.add(layers.Flatten())
             
-            # Dense layers
-            dense_blocks = hp.Int('dense_blocks', 1, 4, default=2)
-            for i in range(dense_blocks):
-                units = hp.Int(f'units_{i}', 64, 512, step=128, default=256)
-                model.add(layers.Dense(
-                    units=units,
-                    activation='relu'
-                ))
-                dropout_rate = hp.Float(f'dropout_{i}', min_value=0.1, max_value=0.5, step=0.1, default=0.25)
-                model.add(layers.Dropout(rate=dropout_rate))
+#             # Dense layers
+#             dense_blocks = hp.Int('dense_blocks', 1, 4, default=2)
+#             for i in range(dense_blocks):
+#                 units = hp.Int(f'units_{i}', 64, 512, step=128, default=256)
+#                 model.add(layers.Dense(
+#                     units=units,
+#                     activation='relu'
+#                 ))
+#                 dropout_rate = hp.Float(f'dropout_{i}', min_value=0.1, max_value=0.5, step=0.1, default=0.25)
+#                 model.add(layers.Dropout(rate=dropout_rate))
             
-            model.add(layers.Dense(1, activation='sigmoid'))
+#             model.add(layers.Dense(1, activation='sigmoid'))
             
-            # Compile the model
-            model.compile(
-                optimizer=keras.optimizers.Adam(
-                    learning_rate=hp.Float('learning_rate', 1e-5, 1e-2, sampling='log', default=1e-3)
-                ),
-                loss='binary_crossentropy',
-                metrics=['accuracy']
-            )
+#             # Compile the model
+#             model.compile(
+#                 optimizer=keras.optimizers.Adam(
+#                     learning_rate=hp.Float('learning_rate', 1e-5, 1e-2, sampling='log', default=1e-3)
+#                 ),
+#                 loss='binary_crossentropy',
+#                 metrics=['accuracy']
+#             )
             
-            return model
+#             return model
 
-hypermodel = CNNHyperModel()
+# hypermodel = CNNHyperModel()
 
 tuner = BayesianOptimization(
     hypermodel,
