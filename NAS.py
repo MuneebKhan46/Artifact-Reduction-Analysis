@@ -171,19 +171,20 @@ tuner = Hyperband(
 )
 
 
-early_stopping = keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=5)
+# early_stopping = keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=5)
 
-tuner.search(
-    X_train, y_train,
-    epochs=20,
-    validation_split=0.15,
-    callbacks=[early_stopping],
-    verbose=1
-)
+# tuner.search(
+#     X_train, y_train,
+#     epochs=20,
+#     validation_split=0.15,
+#     callbacks=[early_stopping],
+#     verbose=1
+# )
 
 
 best_model = tuner.get_best_models(num_models=1)[0]
-
+best_model.summary()
+best_model.save('/ghosting-artifact-metric/Artifact-Reduction-Analysis/nas_directory/best_ghosting_artifact_detector.h5')
 
 
 y_pred = (best_model.predict(X_test) > 0.5).astype("int32")
