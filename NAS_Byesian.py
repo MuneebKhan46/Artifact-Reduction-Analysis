@@ -6,7 +6,8 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-from keras_tuner import BayesianOptimization
+import keras_tuner  
+from keras_tuner import HyperModel, Hyperband, BayesianOptimization
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
