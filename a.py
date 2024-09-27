@@ -1,5 +1,3 @@
-!pip install simplejson
-!pip install jsonfix
 
 import os
 import json
