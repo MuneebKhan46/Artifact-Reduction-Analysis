@@ -58,12 +58,13 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.utils import shuffle
 from sklearn.model_selection import train_test_split
-import keras_tuner  
+import keras_tuner
 from keras_tuner import HyperModel, Hyperband, BayesianOptimization
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, confusion_matrix, roc_auc_score
 
 
+strategy = tf.distribute.MirroredStrategy()
 
 def extract_y_channel_from_yuv_with_patch_numbers(yuv_file_path: str, width: int, height: int):
     y_size = width * height
