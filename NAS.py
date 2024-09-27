@@ -118,5 +118,80 @@ X_balanced, y_balanced = shuffle(X_balanced, y_balanced, random_state=42)
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 
+class CNNHyperModel(HyperModel):
+    def build(self, hp):
+        model = keras.Sequential()
+        
+        # Convolutional layers
+        for i in range(hp.Int('conv_blocks', 1, 3, default=2)):
+            model.add(layers.Conv2D(
+                filters=hp.Int(f'filters_{i}', 32, 128, step=32, default=64),
+                kernel_size=hp.Choice(f'kernel_size_{i}', [3, 5]),
+                activation='relu',
+                padding='same'
+            ))
+            model.add(layers.MaxPooling2D())
+        
+        model.add(layers.Flatten())
+        
+        # Dense layers
+        for i in range(hp.Int('dense_blocks', 1, 2, default=1)):
+            model.add(layers.Dense(
+                units=hp.Int(f'units_{i}', 32, 128, step=32, default=64),
+                activation='relu'
+            ))
+            model.add(layers.Dropout(rate=hp.Float(f'dropout_{i}', 0.0, 0.5, step=0.1, default=0.5)))
+        
+        model.add(layers.Dense(1, activation='sigmoid'))
+        
+        # Compile the model
+        model.compile(
+            optimizer=keras.optimizers.Adam(
+                hp.Float('learning_rate', 1e-4, 1e-2, sampling='log')
+            ),
+            loss='binary_crossentropy',
+            metrics=['accuracy']
+        )
+        
+        return model
 
+
+hypermodel = CNNHyperModel()
+
+tuner = Hyperband(
+    hypermodel,
+    objective='val_accuracy',
+    max_epochs=50,
+    factor=3,
+    directory='/ghosting-artifact-metric/Artifact-Reduction-Analysis/nas_directory',
+    project_name='ghosting_artifact_detection'
+)
+
+
+early_stopping = keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=5)
+
+tuner.search(
+    X_train, y_train,
+    epochs=20,
+    validation_split=0.2,
+    callbacks=[early_stopping],
+    verbose=1
+)
+
+
+best_model = tuner.get_best_models(num_models=1)[0]
+
+
+
+y_pred = (best_model.predict(X_test) > 0.5).astype("int32")
+
+print("Classification Report:")
+print(classification_report(y_test, y_pred))
+
+print("Confusion Matrix:")
+print(confusion_matrix(y_test, y_pred))
+
+# ROC AUC Score
+roc_auc = roc_auc_score(y_test, best_model.predict(X_test))
+print(f'ROC AUC Score: {roc_auc:.2f}')
 
