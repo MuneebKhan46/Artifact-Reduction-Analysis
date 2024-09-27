@@ -191,9 +191,9 @@ tuner = BayesianOptimization(
     distribution_strategy=strategy
 )
 
-# early_stopping = keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=10)
+early_stopping = keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=10)
 
-# tuner.search( X_train, y_train, epochs=50, validation_split=0.15, callbacks=[early_stopping], verbose=1)
+tuner.search( X_train, y_train, epochs=50, validation_split=0.15, callbacks=[early_stopping], verbose=1)
 
 
 # best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
@@ -233,4 +233,4 @@ best_model.summary()
 
 
 
-best_model.save('/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory/best_ghosting_artifact_detector.h5')
+# best_model.save('/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory/best_ghosting_artifact_detector.h5')
