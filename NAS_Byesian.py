@@ -1,29 +1,3 @@
-# import os
-# import json
-# import shutil
-
-# tuner_dir = '/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory/ghosting_artifact_detection'
-# trial_dirs = [os.path.join(tuner_dir, d) for d in os.listdir(tuner_dir) if d.startswith('trial')]
-
-# for trial_dir in trial_dirs:
-#     trial_json_path = os.path.join(trial_dir, 'trial.json')
-#     if os.path.exists(trial_json_path):
-#         try:
-#             with open(trial_json_path, 'r') as f:
-#                 json.load(f)
-#         except json.JSONDecodeError:
-#             print(f"Corrupted trial file detected: {trial_json_path}")
-#             # Remove the corrupted trial directory
-#             shutil.rmtree(trial_dir)
-#             print(f"Removed corrupted trial directory: {trial_dir}")
-#     else:
-#         print(f"'trial.json' not found in: {trial_dir}. Skipping...")
-
-
-
-
-
-
 
 import os
 import numpy as np
