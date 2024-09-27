@@ -115,6 +115,9 @@ y_balanced = np.concatenate((y_majority, y_minority, np.array(augmented_labels))
 
 
 X_balanced, y_balanced = shuffle(X_balanced, y_balanced, random_state=42)
+
+X_train, X_test, y_train, y_test = train_test_split(X_balanced, y_balanced, test_size=0.15, random_state=42, stratify=y_balanced)
+
 print("Num GPUs Available: ", len(tf.config.list_physical_devices('GPU')))
 
 
@@ -173,7 +176,7 @@ early_stopping = keras.callbacks.EarlyStopping(monitor='val_accuracy', patience=
 tuner.search(
     X_train, y_train,
     epochs=20,
-    validation_split=0.2,
+    validation_split=0.15,
     callbacks=[early_stopping],
     verbose=1
 )
