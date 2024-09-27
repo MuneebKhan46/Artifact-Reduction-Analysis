@@ -1,9 +1,7 @@
 import os
 import json
-
 tuner_dir = '/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory/ghosting_artifact_detection'
 trial_dirs = [os.path.join(tuner_dir, d) for d in os.listdir(tuner_dir) if d.startswith('trial')]
-
 for trial_dir in trial_dirs:
     trial_json_path = os.path.join(trial_dir, 'trial.json')
     try:
@@ -14,6 +12,7 @@ for trial_dir in trial_dirs:
         # Remove the corrupted trial directory
         os.remove(trial_json_path)
         os.rmdir(trial_dir)
+
 
 
 
