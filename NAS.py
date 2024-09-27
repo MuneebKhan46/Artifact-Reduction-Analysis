@@ -39,14 +39,14 @@ def extract_y_channel_from_yuv_with_patch_numbers(yuv_file_path: str, width: int
     return patches
 
 
-def load_data_from_csv(csv_path, original_dir, denoised_dir):
+def load_data_from_csv(csv_path, denoised_dir):
     df = pd.read_csv(csv_path)
     
     all_denoised_patches = []
     all_scores = []
  
     for _, row in df.iterrows():
-        denoised_file_name = f"denoised_{row['original_image_name']}.raw"
+        denoised_file_name = f"denoised_{row['image_name']}.raw"
         denoised_path = os.path.join(denoised_dir, denoised_file_name)
         
         denoised_patches = extract_y_channel_from_yuv_with_patch_numbers(denoised_path, row['width'], row['height'])
@@ -55,7 +55,7 @@ def load_data_from_csv(csv_path, original_dir, denoised_dir):
         scores = np.array([0 if float(score) == 0 else 1 for score in row['patch_score'].split(',')])
       
         if len(scores) != len(denoised_patches):
-          print(f"Error: Mismatch in number of patches and scores for {row['original_image_name']}")
+          print(f"Error: Mismatch in number of patches and scores for {row['image_name']}")
           continue
         all_scores.extend(scores)
 
@@ -63,7 +63,7 @@ def load_data_from_csv(csv_path, original_dir, denoised_dir):
 
 def prepare_data(data, labels):
     data = np.array(data).astype('float32') / 255.0
-    data = np.expand_dims(data, axis=-1)  # Add channel dimension
+    data = np.expand_dims(data, axis=-1)
     lbl = np.array(labels)
     return data, lbl
 
