@@ -127,31 +127,51 @@ class CNNHyperModel(keras_tuner.HyperModel):
             model = keras.Sequential()
             
             # Convolutional layers
-            for i in range(hp.Int('conv_blocks', 1, 3, default=2)):
-                model.add(layers.Conv2D(
-                    filters=hp.Int(f'filters_{i}', 32, 128, step=32, default=64),
-                    kernel_size=hp.Choice(f'kernel_size_{i}', [3, 5]),
-                    activation='relu',
-                    padding='same'
-                ))
+            conv_blocks = hp.Int('conv_blocks', 3, 7, default=5)
+            for i in range(conv_blocks):
+                filters = hp.Int(f'filters_{i}', 64, 256, step=64, default=128)
+                kernel_size = hp.Choice(f'kernel_size_{i}', [3, 5], default=3)
+                if i == 0:
+                    model.add(layers.Conv2D(
+                        filters=filters,
+                        kernel_size=kernel_size,
+                        activation='relu',
+                        padding='same',
+                        input_shape=(224, 224, 1)
+                    ))
+                else:
+                    model.add(layers.Conv2D(
+                        filters=filters,
+                        kernel_size=kernel_size,
+                        activation='relu',
+                        padding='same'
+                    ))
+                if hp.Boolean(f'batch_norm_{i}', default=True):
+                    model.add(layers.BatchNormalization())
                 model.add(layers.MaxPooling2D())
+                if hp.Boolean(f'conv_dropout_{i}', default=False):
+                    dropout_rate = hp.Float(f'conv_dropout_rate_{i}', min_value=0.1, max_value=0.5, step=0.1, default=0.2)
+                    model.add(layers.Dropout(rate=dropout_rate))
             
             model.add(layers.Flatten())
             
             # Dense layers
-            for i in range(hp.Int('dense_blocks', 1, 2, default=1)):
+            dense_blocks = hp.Int('dense_blocks', 1, 4, default=2)
+            for i in range(dense_blocks):
+                units = hp.Int(f'units_{i}', 64, 512, step=128, default=256)
                 model.add(layers.Dense(
-                    units=hp.Int(f'units_{i}', 32, 128, step=32, default=64),
+                    units=units,
                     activation='relu'
                 ))
-                model.add(layers.Dropout(rate=hp.Float(f'dropout_{i}', 0.0, 0.5, step=0.1, default=0.5)))
+                dropout_rate = hp.Float(f'dropout_{i}', min_value=0.1, max_value=0.5, step=0.1, default=0.25)
+                model.add(layers.Dropout(rate=dropout_rate))
             
             model.add(layers.Dense(1, activation='sigmoid'))
             
             # Compile the model
             model.compile(
                 optimizer=keras.optimizers.Adam(
-                    hp.Float('learning_rate', 1e-4, 1e-2, sampling='log')
+                    learning_rate=hp.Float('learning_rate', 1e-5, 1e-2, sampling='log', default=1e-3)
                 ),
                 loss='binary_crossentropy',
                 metrics=['accuracy']
@@ -159,13 +179,12 @@ class CNNHyperModel(keras_tuner.HyperModel):
             
             return model
 
-
 hypermodel = CNNHyperModel()
 
 tuner = BayesianOptimization(
     hypermodel,
     objective='val_accuracy',
-    max_trials=50, 
+    max_trials=100, 
     directory='/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory',
     project_name='ghosting_artifact_detection',
     distribution_strategy=strategy
@@ -179,12 +198,6 @@ tuner.search( X_train, y_train, epochs=50, validation_split=0.15, callbacks=[ear
 best_hps = tuner.get_best_hyperparameters(num_trials=1)[0]
 best_model = tuner.hypermodel.build(best_hps)
 
-best_model.build(input_shape=(None, 224, 224, 1))
-best_model.summary()
-best_model.save('/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory/best_ghosting_artifact_detector.h5')
-
-
-history = best_model.fit( X_train, y_train, epochs=50, validation_split=0.15, callbacks=[early_stopping], verbose=1)
 
 
 test_loss, test_accuracy = best_model.evaluate(X_test, y_test)
@@ -202,6 +215,19 @@ print(confusion_matrix(y_test, y_pred))
 
 roc_auc = roc_auc_score(y_test, y_pred_probs)
 print(f'ROC AUC Score: {roc_auc:.2f}')
+
+
+
+
+print("Best Hyperparameters:")
+for key, value in best_hps.values.items():
+    print(f"{key}: {value}")
+
+
+
+best_model.build(input_shape=(None, 224, 224, 1))
+best_model.summary()
+
 
 
 best_model.save('/ghosting-artifact-metric/Artifact-Reduction-Analysis/Byesian_Directory/best_ghosting_artifact_detector.h5')
