@@ -52,7 +52,8 @@ def load_data_from_csv(csv_path, denoised_dir):
         denoised_patches = extract_y_channel_from_yuv_with_patch_numbers(denoised_path, row['width'], row['height'])
         all_denoised_patches.extend(denoised_patches)
       
-        scores = np.array([0 if float(score) == 0 else 1 for score in row['patch_score'].split(',')])
+        patch_scores = row['patch_score'].strip('[]').split(', ')
+        scores = np.array([0 if float(score) == 0 else 1 for score in patch_scores])
       
         if len(scores) != len(denoised_patches):
           print(f"Error: Mismatch in number of patches and scores for {row['image_name']}")
